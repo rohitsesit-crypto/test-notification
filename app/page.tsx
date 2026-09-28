@@ -51,22 +51,36 @@ export default function Home() {
         return;
       }
 
-      const registration =
-        await navigator.serviceWorker.register(
-          "/firebase-messaging-sw.js"
-        );
+     const registration =
+  await navigator.serviceWorker.register(
+    "/firebase-messaging-sw.js",
+    {
+      scope: "/"
+    }
+  );
 
-      const token = await getToken(
-        messaging,
-        {
-          vapidKey:
-            process.env
-              .NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+console.log(
+  "Service worker registered:",
+  registration
+);
 
-          serviceWorkerRegistration:
-            registration
-        }
-      );
+// Wait until the service worker becomes active
+await navigator.serviceWorker.ready;
+
+console.log(
+  "Service worker is active!"
+);
+
+const token = await getToken(
+  messaging,
+  {
+    vapidKey:
+      process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+
+    serviceWorkerRegistration:
+      registration
+  }
+);
 
       if (!token) {
 
