@@ -60,15 +60,31 @@ export default function Home() {
   );
 
 console.log(
-  "Service worker registered:",
+  "SW registration:",
   registration
 );
 
-// Wait until the service worker becomes active
 await navigator.serviceWorker.ready;
 
 console.log(
-  "Service worker is active!"
+  "SW ready:",
+  navigator.serviceWorker.controller
+);
+
+if (!registration.active) {
+  throw new Error(
+    "Service Worker is not active"
+  );
+}
+
+if (!("PushManager" in window)) {
+  throw new Error(
+    "Push API is not supported"
+  );
+}
+
+console.log(
+  "PushManager supported"
 );
 
 const token = await getToken(
@@ -81,6 +97,8 @@ const token = await getToken(
       registration
   }
 );
+
+console.log("FCM TOKEN:", token);
 
       if (!token) {
 
@@ -117,18 +135,15 @@ const token = await getToken(
         await response.json()
       );
 
-    } catch (error) {
+    } catch (error: any) {
+  console.error("FULL FCM ERROR:", error);
 
-      console.error(error);
-
-      setStatus(
-        "❌ " +
-        (error instanceof Error
-          ? error.message
-          : "Something went wrong")
-      );
-
-    }
+  setStatus(
+    `❌ ${error?.name || "Error"}: ${
+      error?.message || "Unknown error"
+    }`
+  );
+}
   }
 
   return (
